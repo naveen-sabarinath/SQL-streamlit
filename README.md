@@ -29,9 +29,9 @@ The app reads MySQL directly and expects a table named **`police`** inside a dat
 
 ```
 .
-├── app.py                           # Streamlit app (SQL-first dashboard)
+├── app.py                           # Streamlit app (SQL- dashboard)
 ├── data.ipynb                       #  Notebook for EDA / experiments (removed 34% of missing data)
-├── traffic_stops - traffic_stops_with_vehicle_number.csv  # Example dataset
+├── traffic_stops - traffic_stops_with_vehicle_number.csv  # Dataset
 └── README.md
 ```
 
