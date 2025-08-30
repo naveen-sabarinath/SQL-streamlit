@@ -30,7 +30,7 @@ The app reads MySQL directly and expects a table named **`police`** inside a dat
 ```
 .
 ├── app.py                           # Streamlit app (SQL-first dashboard)
-├── data.ipynb                       # (Optional) Notebook for EDA / experiments
+├── data.ipynb                       #  Notebook for EDA / experiments (removed 34% of missing data)
 ├── traffic_stops - traffic_stops_with_vehicle_number.csv  # Example dataset
 └── README.md
 ```
@@ -100,14 +100,6 @@ DRUGS_COL     = "drugs_related_stop"
 VEHICLE_COL   = "vehicle_number"
 AGE_COL       = "driver_age"
 ```
-
-> **Tip:** You can convert these to environment variables if you prefer secrets outside source control. For example:
-> ```python
-> import os
-> DB_USER = os.getenv("DB_USER", "root")
-> DB_PASS = os.getenv("DB_PASS", "root")
-> ```
-
 ### 4) Run
 
 ```bash
