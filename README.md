@@ -59,77 +59,12 @@ pip install streamlit pandas sqlalchemy pymysql
 > SQLAlchemy
 > PyMySQL
 > ```
-
-### 2) MySQL setup
-
-Create a database and user (adjust as needed):
-
-```sql
-CREATE DATABASE traffic_stops CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
-CREATE USER 'root'@'localhost' IDENTIFIED BY 'root';  -- or your own user/pass
-GRANT ALL PRIVILEGES ON traffic_stops.* TO 'root'@'localhost';
-FLUSH PRIVILEGES;
-```
-
-Create the `police` table (baseline schema suggestion — adapt to your CSV):
-```sql
-USE traffic_stops;
-
-CREATE TABLE police (
-  id BIGINT PRIMARY KEY AUTO_INCREMENT,
-  stop_date DATETIME NULL,
-  stop_time TIME NULL,
-  country_name VARCHAR(64),
-  driver_gender VARCHAR(8),
-  driver_race VARCHAR(64),
-  violation VARCHAR(128),
-  search_conducted TINYINT(1),
-  is_arrested TINYINT(1),
-  drugs_related_stop TINYINT(1),
-  vehicle_number VARCHAR(64),
-  driver_age INT
-);
-
--- Helpful indexes for the UI filters/queries
-CREATE INDEX idx_police_stopdate   ON police (stop_date);
-CREATE INDEX idx_police_country    ON police (country_name);
-CREATE INDEX idx_police_gender     ON police (driver_gender);
-CREATE INDEX idx_police_race       ON police (driver_race);
-CREATE INDEX idx_police_violation  ON police (violation);
-CREATE INDEX idx_police_search     ON police (search_conducted);
-CREATE INDEX idx_police_arrest     ON police (is_arrested);
-CREATE INDEX idx_police_drugs      ON police (drugs_related_stop);
-```
-
-### 3) Load data
-
-#### Option A — SQL `LOAD DATA` (fastest)
-```sql
-LOAD DATA LOCAL INFILE '/absolute/path/to/traffic_stops_with_vehicle_number.csv'
-INTO TABLE police
-FIELDS TERMINATED BY ','
-ENCLOSED BY '"'
-LINES TERMINATED BY '\n'
-IGNORE 1 LINES
-(@stop_date, @stop_time, @country_name, @driver_gender, @driver_race, @violation,
- @search_conducted, @is_arrested, @drugs_related_stop, @vehicle_number, @driver_age)
-SET
-  stop_date = NULLIF(@stop_date,''),
-  stop_time = NULLIF(@stop_time,''),
-  country_name = NULLIF(@country_name,''),
-  driver_gender = NULLIF(@driver_gender,''),
-  driver_race = NULLIF(@driver_race,''),
-  violation = NULLIF(@violation,''),
-  search_conducted = NULLIF(@search_conducted,''),
-  is_arrested = NULLIF(@is_arrested,''),
-  drugs_related_stop = NULLIF(@drugs_related_stop,''),
-  vehicle_number = NULLIF(@vehicle_number,''),
-  driver_age = NULLIF(@driver_age,'');
+### 2) Load data
 ```
 
 > You may need to allow local infile: `SET GLOBAL local_infile=1;` and add `--local-infile=1` to your MySQL client.
 
-#### Option B — Python (pandas)
+#### Python (pandas)
 ```python
 import pandas as pd
 from sqlalchemy import create_engine
@@ -141,7 +76,7 @@ df = pd.read_csv(csv)
 df.to_sql("police", engine, if_exists="append", index=False, chunksize=10_000)
 ```
 
-### 4) Configure the app
+### 3) Configure the app
 
 Open `app.py` and adjust the config block at the top if needed:
 
@@ -173,7 +108,7 @@ AGE_COL       = "driver_age"
 > DB_PASS = os.getenv("DB_PASS", "root")
 > ```
 
-### 5) Run
+### 4) Run
 
 ```bash
 streamlit run app.py
@@ -223,13 +158,6 @@ The app will start on `http://localhost:8501/` by default.
 - **Datetime parsing**: Ensure CSV date/time formats match the DDL; adjust `LOAD DATA` or pandas parsing as needed.
 - **Local infile errors**: Enable `local_infile` and restart MySQL server if using Option A.
 - **Large CSV**: Use `chunksize` in `to_sql`, or `LOAD DATA` for better performance.
-
----
-
-## 📄 License
-
-This project is released under the MIT License. See `LICENSE` (add one if missing).
-
 ---
 
 ## 🙌 Acknowledgements
